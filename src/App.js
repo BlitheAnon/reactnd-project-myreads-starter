@@ -26,12 +26,27 @@ class BooksApp extends React.Component {
       })
   }
 
-  // 更新移动图书后的图书数据到服务器，暂时忽略
-  updateBooks(){
-      BooksAPI.update().then({},'shelf').then((result)=>{
-          console.log('结果result:'+result);
-      })
-  }
+  // 更新移动图书后的图书数据到服务器
+  updateBooks(book,shelf){
+        BooksAPI.update(book,shelf).then(result=>{
+            console.log('result');
+            console.log(result);
+            // 重新载入新书架
+            BooksAPI.getAll().then((books) => {
+                this.setState({books: books})
+            })
+        })
+    }
+
+    // 选中option
+handleChange(bookid,event) {
+    // console.log(event.target.value);
+    // console.log(bookid);
+    // 更新书架图书
+    this.updateBooks({
+        id: bookid
+    }, event.target.value)
+}
 
   render() {
     //取得state内图书数据
@@ -77,7 +92,7 @@ class BooksApp extends React.Component {
                             <div className="book-top">
                               <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
                               <div className="book-shelf-changer">
-                                <select>
+                                <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
                                   <option value="move" disabled>Move to...</option>
                                   <option value="currentlyReading">Currently Reading</option>
                                   <option value="wantToRead">Want to Read</option>
@@ -104,7 +119,7 @@ class BooksApp extends React.Component {
                                 <div className="book-top">
                                   <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
                                   <div className="book-shelf-changer">
-                                    <select>
+                                    <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
                                       <option value="move" disabled>Move to...</option>
                                       <option value="currentlyReading">Currently Reading</option>
                                       <option value="wantToRead">Want to Read</option>
@@ -131,7 +146,7 @@ class BooksApp extends React.Component {
                                 <div className="book-top">
                                   <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
                                   <div className="book-shelf-changer">
-                                    <select>
+                                    <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
                                       <option value="move" disabled>Move to...</option>
                                       <option value="currentlyReading">Currently Reading</option>
                                       <option value="wantToRead">Want to Read</option>
