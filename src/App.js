@@ -1,5 +1,6 @@
 import React from 'react'
-// import * as BooksAPI from './BooksAPI'
+// 使用提供的api获取动态图书数据
+import * as BooksAPI from './BooksAPI'
 import './App.css'
 
 class BooksApp extends React.Component {
@@ -10,7 +11,26 @@ class BooksApp extends React.Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-    showSearchPage: false
+     // 判断页面显示
+    showSearchPage: false,
+    books:[]
+  }
+
+  // 添加生命周期事件，在组件插入 DOM 之后立即被调用
+  componentDidMount() {
+      // 异步数据请求所有数数据
+      BooksAPI.getAll().then((books) => {
+          this.setState({books: books})
+          console.log('图书');
+          console.log(books);
+      })
+  }
+
+  // 更新移动图书后的图书数据到服务器，暂时忽略
+  updateBooks(){
+      BooksAPI.update().then({},'shelf').then((result)=>{
+          console.log('结果result:'+result);
+      })
   }
 
   render() {
