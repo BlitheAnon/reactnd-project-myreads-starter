@@ -6,6 +6,10 @@ import './App.css'
 import { Route } from 'react-router-dom'
 import {Link} from 'react-router-dom'
 
+// 导入子组件
+import BooksSearch from './BooksSearch'
+
+
 class BooksApp extends React.Component {
   state = {
     /**
@@ -44,27 +48,25 @@ class BooksApp extends React.Component {
     }
 
     // 选中option
-handleChange(bookid,event) {
+handleChange(bookid,shelf) {
     // console.log(event.target.value);
     // console.log(bookid);
     // 更新书架图书
     this.updateBooks({
         id: bookid
-    }, event.target.value)
+    }, shelf)
 }
 
-
-
 // 输入后查询
-handleSearch(event) {
+handleSearch(data) {
     //判断输入为空时不操作
-    if (event.target.value.trim()==='') {
+    if (data==='') {
         this.setState({searchResult: []})
         return
     }
 
     // 取得查询的图书数据
-    BooksAPI.search(event.target.value).then((result) => {
+    BooksAPI.search(data).then((result) => {
         // console.log('search');
         //  console.log(result);
          let tempResult=result
@@ -107,49 +109,15 @@ handleSearch(event) {
       <div className="app">
 
         <Route path='/search' render={({history})=>(
-          <div className="search-books">
-            <div className="search-books-bar">
-              <Link to='/'>
-              <button className="close-search">Close</button>
-              </Link>
-              <div className="search-books-input-wrapper">
-                {/*
-                  NOTES: The search from BooksAPI is limited to a particular set of search terms.
-                  You can find these search terms here:
-                  https://github.com/udacity/reactnd-project-myreads-starter/blob/master/SEARCH_TERMS.md
-
-                  However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
-                  you don't find a specific author or title. Every search is limited by search terms.
-                */}
-                <input type="text" placeholder="Search by title or author" onChange={this.handleSearch.bind(this)}/>
-
-              </div>
-            </div>
-            <div className="search-books-results">
-              <ol className="books-grid">
-                  {searchResult.map((book)=>(
-                      <li key={book.id}>
-                        <div className="book">
-                          <div className="book-top">
-                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks? book.imageLinks.smallThumbnail:"http://via.placeholder.com/128x192"})` }}></div>
-                            <div className="book-shelf-changer">
-                              <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
-                                <option value="move" disabled>Move to...</option>
-                                <option value="currentlyReading">Currently Reading</option>
-                                <option value="wantToRead">Want to Read</option>
-                                <option value="read">Read</option>
-                                <option value="none">None</option>
-                              </select>
-                            </div>
-                          </div>
-                          <div className="book-title">{book.title}</div>
-                          <div className="book-authors">{book.authors}</div>
-                        </div>
-                      </li>
-                  ))}
-              </ol>
-            </div>
-          </div>
+            <BooksSearch
+                onHandleSearch={(input)=>{
+                this.handleSearch(input)
+                }}
+                searchResult={this.state.searchResult}
+                onHandleChange={(bookid,shelf)=>{
+                    this.handleChange(bookid,shelf)
+                }}
+            />
           )}/>
 
           <Route path='/' exact render={()=>(
