@@ -3,6 +3,9 @@ import React from 'react'
 import * as BooksAPI from './BooksAPI'
 import './App.css'
 
+import { Route } from 'react-router-dom'
+import {Link} from 'react-router-dom'
+
 class BooksApp extends React.Component {
   state = {
     /**
@@ -11,9 +14,9 @@ class BooksApp extends React.Component {
      * users can use the browser's back and forward buttons to navigate between
      * pages, as well as provide a good URL they can bookmark and share.
      */
-     // 判断页面显示
-    showSearchPage: false,
-    books:[]
+     // 通过Route链接页面跳转
+    books:[],
+    searchResult:[]
   }
 
   // 添加生命周期事件，在组件插入 DOM 之后立即被调用
@@ -21,20 +24,30 @@ class BooksApp extends React.Component {
       // 异步数据请求所有数数据
       BooksAPI.getAll().then((books) => {
           this.setState({books: books})
-          // console.log('图书');
-          // console.log(books);
+          console.log('react声明周期getAll');
+          console.log(books);
       })
   }
 
   // 更新移动图书后的图书数据到服务器
   updateBooks(book,shelf){
         BooksAPI.update(book,shelf).then(result=>{
-            // console.log('result');
-            // console.log(result);
-            // 重新载入新书架
-            BooksAPI.getAll().then((books) => {
-                this.setState({books: books})
-            })
+            console.log('update');
+            console.log(result);
+            // 判断是否需要重新载入新书架
+            // if (!this.state.showSearchPage) {
+            //     BooksAPI.getAll().then((books) => {
+            //         this.setState({books: books})
+            //         console.log('getAll');
+            //         console.log(books);
+            //     })
+            // }
+                BooksAPI.getAll().then((books) => {
+                    this.setState({books: books})
+                    console.log('updateBooks getAll');
+                    console.log(books);
+                })
+
         })
     }
 
@@ -54,28 +67,34 @@ handleChange(bookid,event) {
 handleSearch(event) {
     // 取得查询的图书数据
     BooksAPI.search(event.target.value).then((result) => {
-        // console.log(result);
+        console.log('search');
+         console.log(result);
         // 查询结果不存在时
         // console.log(Array.isArray(result));
         if (Array.isArray(result)) {
-            this.setState({books: result})
+            this.setState({searchResult: result})
         }else {
-            this.setState({books: []})
+            this.setState({searchResult: []})
         }
     })
 }
 
 
   render() {
-    //取得state内图书数据
+    //取得state内主页图书数据
     const showingBooks=this.state.books
+    //搜索页图书数据
+    const searchResult=this.state.searchResult
 
     return (
       <div className="app">
-        {this.state.showSearchPage ? (
+
+        <Route path='/search' render={({history})=>(
           <div className="search-books">
             <div className="search-books-bar">
-              <button className="close-search" onClick={() => this.setState({ showSearchPage: false })}>Close</button>
+              <Link to='/'>
+              <button className="close-search">Close</button>
+              </Link>
               <div className="search-books-input-wrapper">
                 {/*
                   NOTES: The search from BooksAPI is limited to a particular set of search terms.
@@ -91,7 +110,7 @@ handleSearch(event) {
             </div>
             <div className="search-books-results">
               <ol className="books-grid">
-                  {showingBooks.map((book)=>(
+                  {searchResult.map((book)=>(
                       <li key={book.id}>
                         <div className="book">
                           <div className="book-top">
@@ -114,7 +133,9 @@ handleSearch(event) {
               </ol>
             </div>
           </div>
-        ) : (
+          )}/>
+
+          <Route path='/' exact render={()=>(
           <div className="list-books">
             <div className="list-books-title">
               <h1>MyReads</h1>
@@ -204,11 +225,13 @@ handleSearch(event) {
                 </div>
               </div>
             </div>
-            <div className="open-search">
-              <button onClick={() => this.setState({ showSearchPage: true,books: [] })}>Add a book</button>
-            </div>
+            <Link to='/search' className="open-search">
+              <button onClick={()=>{this.setState({searchResult:[]})}}>Add a book</button>
+            </Link>
           </div>
-        )}
+          )}
+          />
+
       </div>
     )
   }
