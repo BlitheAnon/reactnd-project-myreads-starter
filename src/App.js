@@ -66,11 +66,23 @@ handleSearch(event) {
     BooksAPI.search(event.target.value).then((result) => {
         console.log('search');
          console.log(result);
-        // 查询结果不存在时
-        // console.log(Array.isArray(result));
-
+         let tempResult=result
+         const showingBooks=this.state.books
+        // 判断查询结果是否不存在
         if (Array.isArray(result)) {
-            this.setState({searchResult: result})
+            //当搜索到得图书已存在时，给搜索到的图书添加书架分类
+            for (var i = 0; i < result.length; i++) {
+                for (var j = 0; j < showingBooks.length; j++) {
+                    if (result[i].id===showingBooks[j].id) {
+                        (tempResult[i])['shelf']=showingBooks[j].shelf
+                        break
+                    }else{
+                        (tempResult[i])['shelf']='none'
+                    }
+                }
+            }
+
+            this.setState({searchResult: tempResult})
         }else {
             this.setState({searchResult: []})
         }
@@ -114,7 +126,7 @@ handleSearch(event) {
                           <div className="book-top">
                             <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
                             <div className="book-shelf-changer">
-                              <select value="none" onChange={this.handleChange.bind(this,book.id)}>
+                              <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
                                 <option value="move" disabled>Move to...</option>
                                 <option value="currentlyReading">Currently Reading</option>
                                 <option value="wantToRead">Want to Read</option>
