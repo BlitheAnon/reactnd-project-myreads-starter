@@ -62,12 +62,14 @@ handleSearch(event) {
         this.setState({searchResult: []})
         return
     }
+
     // 取得查询的图书数据
     BooksAPI.search(event.target.value).then((result) => {
-        console.log('search');
-         console.log(result);
+        // console.log('search');
+        //  console.log(result);
          let tempResult=result
          const showingBooks=this.state.books
+
         // 判断查询结果是否不存在
         if (Array.isArray(result)) {
             //当搜索到得图书已存在时，给搜索到的图书添加书架分类
@@ -82,7 +84,10 @@ handleSearch(event) {
                 }
             }
 
+            console.log('tempResult');
+            console.log(tempResult);
             this.setState({searchResult: tempResult})
+
         }else {
             this.setState({searchResult: []})
         }
@@ -95,6 +100,8 @@ handleSearch(event) {
     const showingBooks=this.state.books
     //搜索页图书数据
     const searchResult=this.state.searchResult
+    //判断imageLink是否存在
+    // const thumbnail = this.simageLinks ? imageLinks.thumbnail : "http://via.placeholder.com/128x192";
 
     return (
       <div className="app">
@@ -124,7 +131,7 @@ handleSearch(event) {
                       <li key={book.id}>
                         <div className="book">
                           <div className="book-top">
-                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
+                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks? book.imageLinks.smallThumbnail:"http://via.placeholder.com/128x192"})` }}></div>
                             <div className="book-shelf-changer">
                               <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
                                 <option value="move" disabled>Move to...</option>
