@@ -34,14 +34,6 @@ class BooksApp extends React.Component {
         BooksAPI.update(book,shelf).then(result=>{
             console.log('update');
             console.log(result);
-            // 判断是否需要重新载入新书架
-            // if (!this.state.showSearchPage) {
-            //     BooksAPI.getAll().then((books) => {
-            //         this.setState({books: books})
-            //         console.log('getAll');
-            //         console.log(books);
-            //     })
-            // }
                 BooksAPI.getAll().then((books) => {
                     this.setState({books: books})
                     console.log('updateBooks getAll');
@@ -65,12 +57,18 @@ handleChange(bookid,event) {
 
 // 输入后查询
 handleSearch(event) {
+    //判断输入为空时不操作
+    if (event.target.value.trim()==='') {
+        this.setState({searchResult: []})
+        return
+    }
     // 取得查询的图书数据
     BooksAPI.search(event.target.value).then((result) => {
         console.log('search');
          console.log(result);
         // 查询结果不存在时
         // console.log(Array.isArray(result));
+
         if (Array.isArray(result)) {
             this.setState({searchResult: result})
         }else {
