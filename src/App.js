@@ -205,7 +205,7 @@ handleSearch(event) {
               </div>
             </div>
             <div className="open-search">
-              <button onClick={() => this.setState({ showSearchPage: true })}>Add a book</button>
+              <button onClick={() => this.setState({ showSearchPage: true,books: [] })}>Add a book</button>
             </div>
           </div>
         )}
