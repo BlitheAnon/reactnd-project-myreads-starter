@@ -21,16 +21,16 @@ class BooksApp extends React.Component {
       // 异步数据请求所有数数据
       BooksAPI.getAll().then((books) => {
           this.setState({books: books})
-          console.log('图书');
-          console.log(books);
+          // console.log('图书');
+          // console.log(books);
       })
   }
 
   // 更新移动图书后的图书数据到服务器
   updateBooks(book,shelf){
         BooksAPI.update(book,shelf).then(result=>{
-            console.log('result');
-            console.log(result);
+            // console.log('result');
+            // console.log(result);
             // 重新载入新书架
             BooksAPI.getAll().then((books) => {
                 this.setState({books: books})
@@ -47,6 +47,24 @@ handleChange(bookid,event) {
         id: bookid
     }, event.target.value)
 }
+
+
+
+// 输入后查询
+handleSearch(event) {
+    // 取得查询的图书数据
+    BooksAPI.search(event.target.value).then((result) => {
+        // console.log(result);
+        // 查询结果不存在时
+        // console.log(Array.isArray(result));
+        if (Array.isArray(result)) {
+            this.setState({books: result})
+        }else {
+            this.setState({books: []})
+        }
+    })
+}
+
 
   render() {
     //取得state内图书数据
@@ -67,12 +85,33 @@ handleChange(bookid,event) {
                   However, remember that the BooksAPI.search method DOES search by title or author. So, don't worry if
                   you don't find a specific author or title. Every search is limited by search terms.
                 */}
-                <input type="text" placeholder="Search by title or author"/>
+                <input type="text" placeholder="Search by title or author" onChange={this.handleSearch.bind(this)}/>
 
               </div>
             </div>
             <div className="search-books-results">
-              <ol className="books-grid"></ol>
+              <ol className="books-grid">
+                  {showingBooks.map((book)=>(
+                      <li key={book.id}>
+                        <div className="book">
+                          <div className="book-top">
+                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
+                            <div className="book-shelf-changer">
+                              <select value="none" onChange={this.handleChange.bind(this,book.id)}>
+                                <option value="move" disabled>Move to...</option>
+                                <option value="currentlyReading">Currently Reading</option>
+                                <option value="wantToRead">Want to Read</option>
+                                <option value="read">Read</option>
+                                <option value="none">None</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div className="book-title">{book.title}</div>
+                          <div className="book-authors">{book.authors}</div>
+                        </div>
+                      </li>
+                  ))}
+              </ol>
             </div>
           </div>
         ) : (
