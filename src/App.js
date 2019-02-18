@@ -8,6 +8,7 @@ import {Link} from 'react-router-dom'
 
 // 导入子组件
 import BooksSearch from './BooksSearch'
+import BooksShelf from './BooksShelf'
 
 
 class BooksApp extends React.Component {
@@ -28,20 +29,20 @@ class BooksApp extends React.Component {
       // 异步数据请求所有数数据
       BooksAPI.getAll().then((books) => {
           this.setState({books: books})
-          console.log('react声明周期getAll');
-          console.log(books);
+          // console.log('react声明周期getAll');
+          // console.log(books);
       })
   }
 
   // 更新移动图书后的图书数据到服务器
   updateBooks(book,shelf){
         BooksAPI.update(book,shelf).then(result=>{
-            console.log('update');
-            console.log(result);
+            // console.log('update');
+            // console.log(result);
                 BooksAPI.getAll().then((books) => {
                     this.setState({books: books})
-                    console.log('updateBooks getAll');
-                    console.log(books);
+                    // console.log('updateBooks getAll');
+                    // console.log(books);
                 })
 
         })
@@ -86,8 +87,8 @@ handleSearch(data) {
                 }
             }
 
-            console.log('tempResult');
-            console.log(tempResult);
+            // console.log('tempResult');
+            // console.log(tempResult);
             this.setState({searchResult: tempResult})
 
         }else {
@@ -102,8 +103,6 @@ handleSearch(data) {
     const showingBooks=this.state.books
     //搜索页图书数据
     const searchResult=this.state.searchResult
-    //判断imageLink是否存在
-    // const thumbnail = this.simageLinks ? imageLinks.thumbnail : "http://via.placeholder.com/128x192";
 
     return (
       <div className="app">
@@ -113,7 +112,7 @@ handleSearch(data) {
                 onHandleSearch={(input)=>{
                 this.handleSearch(input)
                 }}
-                searchResult={this.state.searchResult}
+                searchResult={searchResult}
                 onHandleChange={(bookid,shelf)=>{
                     this.handleChange(bookid,shelf)
                 }}
@@ -127,87 +126,33 @@ handleSearch(data) {
             </div>
             <div className="list-books-content">
               <div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Currently Reading</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                    {showingBooks.filter( book => book.shelf === "currentlyReading" ).map((book)=>(
-                        <li key={book.id}>
-                          <div className="book">
-                            <div className="book-top">
-                              <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                              <div className="book-shelf-changer">
-                                <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
-                                  <option value="move" disabled>Move to...</option>
-                                  <option value="currentlyReading">Currently Reading</option>
-                                  <option value="wantToRead">Want to Read</option>
-                                  <option value="read">Read</option>
-                                  <option value="none">None</option>
-                                </select>
-                              </div>
-                            </div>
-                            <div className="book-title">{book.title}</div>
-                            <div className="book-authors">{book.authors}</div>
-                          </div>
-                        </li>
-                    ))}
-                    </ol>
-                  </div>
-                </div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Want to Read</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                        {showingBooks.filter( book => book.shelf === "wantToRead" ).map((book)=>(
-                            <li key={book.id}>
-                              <div className="book">
-                                <div className="book-top">
-                                  <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                                  <div className="book-shelf-changer">
-                                    <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
-                                      <option value="move" disabled>Move to...</option>
-                                      <option value="currentlyReading">Currently Reading</option>
-                                      <option value="wantToRead">Want to Read</option>
-                                      <option value="read">Read</option>
-                                      <option value="none">None</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div className="book-title">{book.title}</div>
-                                <div className="book-authors">{book.authors}</div>
-                              </div>
-                            </li>
-                        ))}
-                    </ol>
-                  </div>
-                </div>
-                <div className="bookshelf">
-                  <h2 className="bookshelf-title">Read</h2>
-                  <div className="bookshelf-books">
-                    <ol className="books-grid">
-                        {showingBooks.filter( book => book.shelf === "read" ).map((book)=>(
-                            <li key={book.id}>
-                              <div className="book">
-                                <div className="book-top">
-                                  <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                                  <div className="book-shelf-changer">
-                                    <select value={book.shelf} onChange={this.handleChange.bind(this,book.id)}>
-                                      <option value="move" disabled>Move to...</option>
-                                      <option value="currentlyReading">Currently Reading</option>
-                                      <option value="wantToRead">Want to Read</option>
-                                      <option value="read">Read</option>
-                                      <option value="none">None</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div className="book-title">{book.title}</div>
-                                <div className="book-authors">{book.authors}</div>
-                              </div>
-                            </li>
-                        ))}
-                    </ol>
-                  </div>
-                </div>
+                  <BooksShelf
+                      showingBooks={showingBooks}
+                      onHandleChange={(bookid,shelf)=>{
+                          this.handleChange(bookid,shelf)
+                      }}
+                      shelfTitle="Currently Reading"
+                      shelfType="currentlyReading"
+                  />
+
+                  <BooksShelf
+                      showingBooks={showingBooks}
+                      onHandleChange={(bookid,shelf)=>{
+                          this.handleChange(bookid,shelf)
+                      }}
+                      shelfTitle="Want to Read"
+                      shelfType="wantToRead"
+                  />
+
+                  <BooksShelf
+                      showingBooks={showingBooks}
+                      onHandleChange={(bookid,shelf)=>{
+                          this.handleChange(bookid,shelf)
+                      }}
+                      shelfTitle="Read"
+                      shelfType="read"
+                  />
+
               </div>
             </div>
             <Link to='/search' className="open-search">
